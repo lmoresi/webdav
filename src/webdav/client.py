@@ -35,7 +35,7 @@ def listdir(directory):
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
         if os.path.isdir(file_path):
-            filename = f'{filename}{os.path.sep}'
+            filename = '{}{}'.format(filename,os.path.sep)
         file_names.append(filename)
     return file_names
 
@@ -51,7 +51,7 @@ def get_options(option_type, from_options):
     _options = dict()
 
     for key in option_type.keys:
-        key_with_prefix = f'{option_type.prefix}{key}'
+        key_with_prefix = '{}{}'.format(option_type.prefix,key)
         if key not in from_options and key_with_prefix not in from_options:
             _options[key] = ''
         elif key in from_options:
@@ -65,7 +65,7 @@ def get_options(option_type, from_options):
 def wrap_connection_error(fn):
     @functools.wraps(fn)
     def _wrapper(self, *args, **kw):
-        log.debug(f'Requesting {fn}({args}, {kw})')
+        log.debug('Requesting {}({}, {})'.format(fn, args, kw))
         try:
             res = fn(self, *args, **kw)
         except requests.ConnectionError:
@@ -124,7 +124,7 @@ class Client(object):
             headers.extend(headers_ext)
 
         if self.webdav.token:
-            webdav_token = f'Authorization: OAuth {self.webdav.token}'
+            webdav_token = 'Authorization: OAuth {token}'.format(token=self.webdav.token)
             headers.append(webdav_token)
         return dict([map(lambda s: s.strip(), i.split(':')) for i in headers])
 
@@ -134,7 +134,7 @@ class Client(object):
         :param path: uri path.
         :return: the url string.
         """
-        return f'{self.webdav.hostname}{self.webdav.root}{path}'
+        return '{}{}{}'.format(self.webdav.hostname,self.webdav.root,path)
 
     def get_full_path(self, urn):
         """Generates full path to remote resource exclude hostname.
@@ -142,7 +142,7 @@ class Client(object):
         :param urn: the URN to resource.
         :return: full path to resource with root path.
         """
-        return f'{self.webdav.root}{urn.path()}'
+        return '{}{}'.format(self.webdav.root,urn.path())
 
     def execute_request(self, action, path, data=None, headers_ext=None):
         """Generate request to WebDAV server for specified action and path and execute it.
@@ -350,7 +350,7 @@ class Client(object):
         os.makedirs(local_path)
 
         for resource_name in self.list(urn.path()):
-            _remote_path = f'{urn.path()}{resource_name}'
+            _remote_path = '{}{}'.format(urn.path(),resource_name)
             _local_path = os.path.join(local_path, resource_name)
             self.download(local_path=_local_path, remote_path=_remote_path, progress=progress)
 
@@ -374,7 +374,7 @@ class Client(object):
             raise OptionNotValid(name='file', value=file)
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            local_path = f'{temp_dir}{os.path.sep}{file}'
+            local_path = '{}{}{}'.format(temp_dir,os.path.sep,file)
 
             if remote_file_exists:
                 self.download_file(file, local_path)
@@ -493,7 +493,8 @@ class Client(object):
         self.mkdir(remote_path)
 
         for resource_name in listdir(local_path):
-            _remote_path = f'{urn.path()}{resource_name}'
+            # _remote_path = f'{urn.path()}{resource_name}'
+            _remote_path = '{}{}'.format(urn.path(),resource_name)
             _local_path = os.path.join(local_path, resource_name)
             self.upload(local_path=_local_path, remote_path=_remote_path, progress=progress)
 
@@ -566,7 +567,7 @@ class Client(object):
         if not self.check(urn_to.parent()):
             raise RemoteParentNotFound(urn_to.path())
 
-        header_destination = f'Destination: {self.get_full_path(urn_to)}'
+        header_destination = 'Destination: {}'.format(self.get_full_path(urn_to))
         self.execute_request(action='copy', path=urn_from.quote(), headers_ext=[header_destination])
 
     @wrap_connection_error
@@ -586,8 +587,8 @@ class Client(object):
         if not self.check(urn_to.parent()):
             raise RemoteParentNotFound(urn_to.path())
 
-        header_destination = f'Destination: {self.get_full_path(urn_to)}'
-        header_overwrite = f'Overwrite: {"T" if overwrite else "F"}'
+        header_destination = 'Destination: {}'.format(self.get_full_path(urn_to))
+        header_overwrite   = 'Overwrite: {}'.format("T" if overwrite else "F")
         self.execute_request(action='move', path=urn_from.quote(), headers_ext=[header_destination, header_overwrite])
 
     @wrap_connection_error
@@ -709,13 +710,13 @@ class Client(object):
             raise LocalResourceNotFound(local_directory)
 
         paths = self.list(urn.path())
-        expression = f'^{urn.path()}'
+        expression = '^{}'.format(urn.path())
         remote_resource_names = prune(paths, expression)
 
         for local_resource_name in listdir(local_directory):
 
             local_path = os.path.join(local_directory, local_resource_name)
-            remote_path = f'{urn.path()}{local_resource_name}'
+            remote_path = '{}{}'.format(urn.path(),local_resource_name)
 
             if os.path.isdir(local_path):
                 if not self.check(remote_path=remote_path):
@@ -742,13 +743,13 @@ class Client(object):
         local_resource_names = listdir(local_directory)
 
         paths = self.list(urn.path())
-        expression = f'^{remote_directory}'
+        expression = '^{}'.format(remote_directory)
         remote_resource_names = prune(paths, expression)
 
         for remote_resource_name in remote_resource_names:
 
             local_path = os.path.join(local_directory, remote_resource_name)
-            remote_path = f'{urn.path()}{remote_resource_name}'
+            remote_path = '{}{}'.format(urn.path(),remote_resource_name)
 
             remote_urn = Urn(remote_path)
 
@@ -773,7 +774,7 @@ class Resource(object):
         self.urn = urn
 
     def __str__(self):
-        return f'resource {self.urn.path()}'
+        return 'resource {}'.format(self.urn.path())
 
     def is_dir(self):
         return self.client.is_dir(self.urn.path())
@@ -782,7 +783,7 @@ class Resource(object):
         old_path = self.urn.path()
         parent_path = self.urn.parent()
         new_name = Urn(new_name).filename()
-        new_path = f'{parent_path}{new_name}'
+        new_path = '{}{}'.format(parent_path,new_name)
 
         self.client.move(remote_path_from=old_path, remote_path_to=new_path)
         self.urn = Urn(new_path)

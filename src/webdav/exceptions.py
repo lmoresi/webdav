@@ -13,7 +13,7 @@ class OptionNotValid(NotValid):
         self.ns = ns
 
     def __str__(self):
-        return f'Option ({self.ns}{self.name}={self.value}) have invalid name or value'
+        return 'Option ({}{}={}) have invalid name or value'.format(self.ns,self.name,self.value)
 
 
 class CertificateNotValid(NotValid):
@@ -29,7 +29,7 @@ class LocalResourceNotFound(NotFound):
         self.path = path
 
     def __str__(self):
-        return f'Local file: {self.path} not found'
+        return 'Local file: {} not found'.format(self.path)
 
 
 class RemoteResourceNotFound(NotFound):
@@ -37,7 +37,7 @@ class RemoteResourceNotFound(NotFound):
         self.path = path
 
     def __str__(self):
-        return f'Remote resource: {self.path} not found'
+        return 'Remote resource: {} not found'.format(self.path)
 
 
 class RemoteParentNotFound(NotFound):
@@ -45,7 +45,7 @@ class RemoteParentNotFound(NotFound):
         self.path = path
 
     def __str__(self):
-        return f'Remote parent for: {self.path} not found'
+        return 'Remote parent for: {} not found'.format(self.path)
 
 
 class ResourceTooBig(WebDavException):
@@ -55,7 +55,7 @@ class ResourceTooBig(WebDavException):
         self.max_size = max_size
 
     def __str__(self):
-        return f'Resource {self.path} is too big, it should be less then {self.max_size} but actually: {self.size}'
+        return 'Resource {} is too big, it should be less then {} but actually: {}'.format(self.path, self.max_size, self.size)
 
 
 class MethodNotSupported(WebDavException):
@@ -64,7 +64,7 @@ class MethodNotSupported(WebDavException):
         self.server = server
 
     def __str__(self):
-        return f'Method {self.name} not supported for {self.server}'
+        return 'Method {} not supported for {}'.format(self.name, self.server)
 
 
 class ConnectionException(WebDavException):
@@ -80,7 +80,7 @@ class NoConnection(WebDavException):
         self.hostname = hostname
 
     def __str__(self):
-        return f'No connection with {self.hostname}'
+        return 'No connection with {}'.format(self.hostname)
 
 
 # This exception left only for supporting original library interface.
@@ -89,7 +89,7 @@ class NotConnection(WebDavException):
         self.hostname = hostname
 
     def __str__(self):
-        return f'No connection with {self.hostname}'
+        return 'No connection with {}'.format(self.hostname)
 
 
 class ResponseErrorCode(WebDavException):
@@ -99,7 +99,7 @@ class ResponseErrorCode(WebDavException):
         self.message = message
 
     def __str__(self):
-        return f'Request to {self.url} failed with code {self.code} and message: {self.message}'
+        return 'Request to {} failed with code {} and message: {}'.format(self.url, self.code, self.message)
 
 
 class ServerException(WebDavException):
@@ -109,8 +109,8 @@ class ServerException(WebDavException):
         self.message = message
 
     def __str__(self):
-        return f'WebDAV server failed to process request to {self.url} failed with code {self.code} and message:' \
-            f' {self.message}'
+        return 'WebDAV server failed to process request to {} failed with code {} and message:'.format(self.url, self.code) \
+            '{}'.format(self.message)
 
 
 class NotEnoughSpace(WebDavException):

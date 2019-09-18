@@ -32,10 +32,10 @@ class Test(test):
 
 setup(
     name='webdav',
-    version='1.1.7',
+    version='1.1.7_lm',
     packages=['webdav'],
     package_dir={'': 'src'},
-    requires=['python (>= 3.6)'],
+    requires=['python (>= 3.5)'],
     install_requires=(
         'lxml',
         'requests',
