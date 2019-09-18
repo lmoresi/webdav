@@ -109,8 +109,7 @@ class ServerException(WebDavException):
         self.message = message
 
     def __str__(self):
-        return 'WebDAV server failed to process request to {} failed with code {} and message:'.format(self.url, self.code) \
-            '{}'.format(self.message)
+        return 'WebDAV server failed to process request to {} failed with code {} and message: {}'.format(self.url, self.code, self.message)
 
 
 class NotEnoughSpace(WebDavException):
